@@ -1,29 +1,34 @@
+<!DOCTYPE html>
 <html>
-  <style>
-    body{ 
-      font-size: 15pt;
-      font-family: arial;
-    }
-  </style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Columbia Buy & Sell</title>
+    <link
+      href="{{ url_for('static',filename='styles/style.css') }}"
+      rel="stylesheet"
+    />
+  </head>
 
+  <body>
+    <h1>Columbia Buy & Sell</h1>
 
-<body>
-  <h1>Some famous Computer Scientists</h1>
-  <div>{{data}}</div>
+    <form method="POST" action="">
+      <label for="keyword">Search:</label><br>
+      <input type="text" id="keyword" name="keyword"><br>
+      <input type="submit" value="Submit">
+    </form>
 
-  <div>
-    {% for n in data %}
-    <div>{{n}}</div>
-    {% endfor %}
-  </div>
-
-<p><a href="another">Go to the other page</a></p>
-
-<form method="POST" action="/add">
-<p>Name of new computer scientist: <input type="text" name="name"> <input type="submit" value="Add"></p>
-</form>
-
-</body>
-
-
+    <div>
+      {% for product in products %}
+      <div class="product">
+        <img class="product-image" src="{{product[2]}}" alt="{{product[0]}}" />
+        <link><div class="product-name">{{product[0]}}</div></link>
+        <div class = "product-price">${{product[1]}}</div>
+        <div class= "product-category">category: {{product[3]}}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </body>
 </html>

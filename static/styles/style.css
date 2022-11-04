@@ -1,0 +1,22 @@
+body {
+  font-size: 15pt;
+  font-family: arial;
+}
+
+.product {
+  padding: 10px;
+}
+
+.product-image {
+  height: 200px;
+  width: 200px;
+}
+
+.product-name {
+  font-size: 20pt;
+  font-weight: bold;
+}
+
+.product-category {
+  font-size: 13px;
+}
