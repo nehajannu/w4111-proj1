@@ -175,6 +175,18 @@ def add():
 def login():
     abort(401)
     this_is_never_executed()
+    
+# server code for adding products to the storefront
+@app.route('/save_name'), methods = ['GET', 'POST']
+def save_name()
+if request.method == 'POST':
+    if 'product-name' in request.form:
+        productname = request.form['product-name']
+    if 'product-price' in request.form:
+        productprice = request.form['product-price']
+    if 'product-image' in request.form:
+        productimage = request.form['product-image']
+    
 
 
 if __name__ == "__main__":
