@@ -2,8 +2,7 @@ import os
   # accessible as a variable in index.html:
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response
-from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
+from flask import Flask, request, render_template, g, redirect, Response, url_for
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
@@ -68,10 +67,21 @@ def index():
   return render_template("index.html", products = products)
 
 #Logging users in
-@app.route('/login')
+@app.route('/login', methods=['GET','POST'])
 def login():
-    abort(401)
-    this_is_never_executed()
+    error = None
+    if request.method == 'POST':
+      cuid = request.form['cuid']
+      cursor = g.conn.execute("SELECT password FROM cuuser WHERE cuid = %s", cuid)
+      record = cursor.fetchall()
+      cursor.close()
+      password = record[0]['password']
+
+      if password and password == request.form['password']:
+        return redirect(url_for('index'))
+      else:
+        error = 'Invalid cuid or password. Please try again'
+    return render_template('login.html', error=error)
     
 #Server code for adding products to the storefront
 @app.route('/save_name', methods = ['GET', 'POST'])

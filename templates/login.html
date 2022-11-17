@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Columbia Buy & Sell</title>
+    <link
+      href="{{ url_for('static',filename='styles/style.css') }}"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <h1>Columbia Buy & Sell</h1>
+    <div>{{error}}</div>
+    <h2>Please log in:</h2>
+    <form action="/login" method="post">
+      <label for="cuid">CUID:</label>
+      <input type="text" name="cuid" id="cuid" /> <br />
+      <label for="password">Password:</label>
+      <input type="password" name="password" id="password" /> <br />
+      <input type="submit" value="Login" />
+    </form>
+  </body>
+</html>
