@@ -3,6 +3,7 @@ import os
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
+from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
@@ -52,9 +53,6 @@ def index():
 
   """
 
-  # DEBUG: this is debugging code to see what request looks like
-  print(request.args)
-
   #Handle search request
   if request.method == "POST":
     keyword = request.form['keyword']
@@ -69,78 +67,22 @@ def index():
   cursor.close()
   return render_template("index.html", products = products)
 
-
-  #
-  # Flask uses Jinja templates, which is an extension to HTML where you can
-  # pass data to a template and dynamically generate HTML based on the data
-  # (you can think of it as simple PHP)
-  # documentation: https://realpython.com/primer-on-jinja-templating/
-  #
-  # You can see an example template in templates/index.html
-  #
-  # context are the variables that are passed to the template.
-  # for example, "data" key in the context variable defined below will be
-  # accessible as a variable in index.html:
-  #
-  #     # will print: [u'grace hopper', u'alan turing', u'ada lovelace']
-  #     <div>{{data}}</div>
-  #
-  #     # creates a <div> tag for each element in data
-  #     # will print:
-  #     #
-  #     #   <div>grace hopper</div>
-  #     #   <div>alan turing</div>
-  #     #   <div>ada lovelace</div>
-  #     #
-  #     {% for n in data %}
-  #     <div>{{n}}</div>
-  #     {% endfor %}
-  #
-  context = dict(data = names)
-
-
-  #
-  # render_template looks in the templates/ folder for files.
-  # for example, the below file reads template/index.html
-  #
-  return render_template("index.html", **context)
-
-#
-# This is an example of a different path.  You can see it at:
-#
-#     localhost:8111/another
-#
-# Notice that the function name is another() rather than index()
-# The functions for each app.route need to have different names
-#
-@app.route('/another')
-def another():
-  return render_template("another.html")
-
-
-# Example of adding new data to the database
-@app.route('/add', methods=['POST'])
-def add():
-  name = request.form['name']
-  g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
-  return redirect('/')
-
-
+#Logging users in
 @app.route('/login')
 def login():
     abort(401)
     this_is_never_executed()
     
-# server code for adding products to the storefront
-@app.route('/save_name'), methods = ['GET', 'POST']
-def save_name()
-if request.method == 'POST':
-    if 'product-name' in request.form:
-        productname = request.form['product-name']
-    if 'product-price' in request.form:
-        productprice = request.form['product-price']
-    if 'product-image' in request.form:
-        productimage = request.form['product-image']
+#Server code for adding products to the storefront
+@app.route('/save_name', methods = ['GET', 'POST'])
+def save_name():
+  if request.method == 'POST':
+      if 'product-name' in request.form:
+          productname = request.form['product-name']
+      if 'product-price' in request.form:
+          productprice = request.form['product-price']
+      if 'product-image' in request.form:
+          productimage = request.form['product-image']
     
 #Sending search request to database
 @app.route('/search')
