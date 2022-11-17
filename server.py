@@ -69,16 +69,19 @@ def index():
 #Logging users in
 @app.route('/login', methods=['GET','POST'])
 def login():
-    error = None
+    error = ""
     if request.method == 'POST':
       cuid = request.form['cuid']
       cursor = g.conn.execute("SELECT password FROM cuuser WHERE cuid = %s", cuid)
       record = cursor.fetchall()
       cursor.close()
-      password = record[0]['password']
 
-      if password and password == request.form['password']:
-        return redirect(url_for('index'))
+      if record:
+        password = record[0]['password']
+        if password == request.form['password']:
+          return redirect(url_for('index'))
+        else:
+          error = 'Invalid cuid or password. Please try again'
       else:
         error = 'Invalid cuid or password. Please try again'
     return render_template('login.html', error=error)

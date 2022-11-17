@@ -1,6 +1,45 @@
 body {
   font-size: 15pt;
   font-family: arial;
+  background: white;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+.container {
+  padding: 10px;
+  margin: 0px;
+}
+
+.columbia-header {
+  color: #555555;
+  background: white;
+  padding: 20px;
+  text-align: center;
+  vertical-align: center;
+  align-items: center;
+}
+
+.columbia {
+  color: #555555;
+  font-weight: bold;
+  font-size: xx-large;
+  padding-left: 10px;
+}
+
+.navbar {
+  background: rgb(185, 217, 235);
+  color: #555555;
+}
+
+.profile-header {
+  justify-content: end;
+}
+
+.notification {
+  width: 600px;
 }
 
 .product {
