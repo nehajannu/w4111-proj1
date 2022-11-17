@@ -55,6 +55,28 @@ def index():
   # DEBUG: this is debugging code to see what request looks like
   print(request.args)
 
+  #Display User Information 
+  cursor = g.conn.execute("SELECT * FROM CUUser")
+  userinfo = []
+  for result in cursor:
+    userinfo.append((result['cuid'], result['username'], result['profilepic'], result['userdescription']))  
+  cursor.close()
+  
+  #Display Payment Info
+  cursor = g.conn.execute("SELECT * FROM Payment")
+  paymentinfo = []
+  for result in cursor:
+    paymentinfo.append((result['creditcardno'], result['creditcardholder'], result['creditcardexpdate'])) 
+  cursor.close()
+  
+  #Display Order Info
+  cursor = g.conn.execute("SELECT * FROM Order_Placed")
+  orderinfo = []
+  for result in cursor:
+    orderinfo.append((result['orderid'], result['orderitemcount'], result['dateordered'], result['ordertotalprice'])) 
+  cursor.close()
+  
+  
   #Handle search request
   if request.method == "POST":
     keyword = request.form['keyword']
