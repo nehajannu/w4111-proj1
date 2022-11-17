@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Columbia Buy & Sell</title>
+    <link
+      href="{{ url_for('static',filename='styles/style.css') }}"
+      rel="stylesheet"
+    />
+  </head>
+ 
+  <form action = "/save_name" method = "post">
+    <p> Add a product to your storefront so you can sell it! </p>
+    <input type = "text" name = "product-name"> <br>
+    <input type = "float" name = "product-price"> <br>
+    <input type = "text" name = "product-image"> <br>
+    <input type = "submit" value = "Add Product">
+  </form
+ 
+ 
+      {% endfor %}
+    </div>
+  </body>
+</html>
