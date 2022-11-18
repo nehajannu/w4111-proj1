@@ -1,20 +1,33 @@
-{% extends "application.html"%}
-{% block content %}
-<form method="POST" action="">
-  <label for="keyword">Search:</label><br>
-  <input type="text" id="keyword" name="keyword"><br>
-  <input type="submit" value="Submit">
-</form>
+{% extends "application.html"%} {% block content %}
+<div class="input-group">
+  <div class="form-outline">
+    <form method="POST" action="">
+      <label for="keyword" class="search-label">Search</label>
+      <input class="search-input" type="text" id="keyword" name="keyword" />
+      <button type="submit" class="search-button" title="search-btn">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+    </form>
+  </div>
+</div>
 
-<div>
+<div class="row card-group">
   {% for product in products %}
-  <div class="product">
-    <img class="product-image" src="{{product[2]}}" alt="{{product[0]}}" />
-    <link><div class="product-name">{{product[0]}}</div></link>
-    <div class = "product-price">${{product[1]}}</div>
-    <div class= "product-category">category: {{product[3]}}</div>
+  <div class="col-3">
+    <div class="card product">
+      <img
+        class="card-img-top product-image"
+        src="{{product[2]}}"
+        alt="{{product[0]}}"
+      />
+      <div class="card-body">
+        <div class="card-title">{{product[0].upper()}}</div>
+        <div class="card-text">${{product[1]}}</div>
+        <div class="card-text product-seller">Sold by {{product[4]}}</div>
+        <a href="#" class="btn card-submit">Add to cart</a>
+      </div>
+    </div>
   </div>
   {% endfor %}
 </div>
 {% endblock %}
-
