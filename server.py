@@ -3,6 +3,8 @@ import os
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response, url_for, session
+import string
+import random
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
@@ -117,35 +119,59 @@ def logout():
   session.pop('store_id', None)
   return render_template('login.html')
 
+#Creating a new account
+
+
 #User profile
 @app.route('/profile', methods=['GET','POST'])
 def profile():
   if session.get('logged_in') == True:
-    
-      cursor = g.conn.execute("SELECT productname, productprice, productimage FROM cuuser NATURAL JOIN manages NATURAL JOIN listed_on NATURAL JOIN product WHERE cuid = %s", session['current_user'])
-      storefront_record = cursor.fetchall()
-      cursor.close()
-      #Default: Show all items
-      storefront_products = []
-      for result in storefront_record:
-        storefront_products.append((result['productname'],result['productprice'],result['productimage']))
-      return render_template("profile.html", storefront_products = storefront_products)
-
-  return render_template('profile.html')
+    cursor = g.conn.execute("SELECT productname, productprice, productimage FROM cuuser NATURAL JOIN manages NATURAL JOIN listed_on NATURAL JOIN product WHERE cuid = %s", session['current_user'])
+    storefront_record = cursor.fetchall()
+    cursor.close()
+    #Show all items that the user has listed
+    storefront_products = []
+    for result in storefront_record:
+      storefront_products.append((result['productname'],result['productprice'],result['productimage']))
+    return render_template("profile.html", storefront_products = storefront_products)
   
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
-    
+
+#Update user profile
+
+
+#Generate random id for store, product, and order
+def id_generator(length=10, c=string.digits):
+  return ''.join(random.choice(c) for _ in range(length))
+
 #Server code for adding products to the storefront
-@app.route('/save_name', methods = ['GET', 'POST'])
-def save_name():
-  if request.method == 'POST':
-      if 'product-name' in request.form:
-          productname = request.form['product-name']
-      if 'product-price' in request.form:
-          productprice = request.form['product-price']
-      if 'product-image' in request.form:
-          productimage = request.form['product-image']
+@app.route('/add_product', methods = ['GET', 'POST'])
+def add_product():
+  if session.get('logged_in') == True:
+    if request.method == 'POST':
+      productid = id_generator()
+      productname = request.form['product-name']
+      productprice = request.form['product-price']
+      productdescription = request.form['product-description']
+      productimage = request.form['product-image']
+      categoryid = request.form['product-category']
+
+      #Add product to database
+      cursor = g.conn.execute("INSERT INTO product VALUES(%s,%s,%s,%s,%s)",productid, productname, productprice, productdescription, productimage)
+      cursor.close()
+      #Add product to category (belongs_to relationship)
+      cursor = g.conn.execute("INSERT INTO belongs_to VALUES(%s,%s)",productid, categoryid)
+      cursor.close()
+      #Add product to storefront (listed_on relationship)
+      cursor = g.conn.execute("INSERT INTO listed_on VALUES(%s,%s)",productid, session['storeid'])
+      cursor.close()
+      
+      return redirect(url_for('profile'))
+    return render_template('add_product.html')
+
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
     
 if __name__ == "__main__":
   import click
