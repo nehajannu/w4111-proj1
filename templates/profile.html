@@ -1,0 +1,50 @@
+{% extends "application.html"%} {% block content %}
+
+<div class="profile-box float-left">
+  <h1 class="profile-title">PROFILE</h1>
+  <div class="image-cropper">
+    <img
+      class="profile-pic"
+      src="{{session['profilepic']}}"
+      title="profilepic"
+    />
+  </div>
+  <div class="user-info">
+    <div class="info-line">
+      <span class="profile-label">CUID</span>
+      <span class="profile-content">{{session['current_user']}}</span>
+    </div>
+    <div class="info-line">
+      <span class="profile-label">Name</span>
+      <span class="profile-content">{{session['username']}}</span>
+    </div>
+    <div class="info-line">
+      <span class="profile-label">Description</span><br />
+      <span class="profile-des">{{session['userdescription']}}</span>
+    </div>
+    <a href="#" class="btn profile-button">Edit profile</a>
+  </div>
+</div>
+
+<div class="store-box float-right">
+  <h1>STOREFRONT</h1>
+  <div class="row card-group">
+    {% for product in storefront_products %}
+    <div class="col-4">
+      <div class="card product">
+        <img
+          class="card-img-top product-image"
+          src="{{product[2]}}"
+          alt="{{product[0]}}"
+        />
+        <div class="card-body">
+          <div class="card-title">{{product[0].upper()}}</div>
+          <div class="card-text">${{product[1]}}</div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
