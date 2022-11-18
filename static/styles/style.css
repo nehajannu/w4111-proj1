@@ -17,6 +17,14 @@ body {
   color: #555555;
 }
 
+h1 {
+  font-family: "Open Sans", sans-serif;
+  width: 100%;
+  text-align: center;
+  padding: 10px 0px 10px 0px;
+  font-size: large;
+}
+
 a {
   color: #7eabd5;
 }
@@ -26,8 +34,8 @@ a:hover {
 }
 
 .container {
-  padding: 10px;
   margin: 0px;
+  padding: 0px;
   width: 100%;
   height: 100%;
   max-width: 100%;
@@ -240,4 +248,80 @@ a:hover {
 .dropdown-item:hover {
   color: #7eabd5;
   background: white;
+}
+
+.profile-title {
+  color: white;
+}
+
+.profile-box {
+  padding: 10px 20px 10px 20px;
+  max-width: 23%;
+  height: 100%;
+  font-size: medium;
+  background: linear-gradient(to bottom, rgb(185, 217, 235) 30%, white 30%);
+  border-right: 1px solid #cecece;
+}
+
+.image-cropper {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+  margin: 10px 0px 20px 0px;
+}
+
+.user-info {
+  margin: 20px 10px 20px 10px;
+  color: #7b7b7b;
+}
+
+.info-line {
+  margin: 10px 0px 10px 0px;
+}
+
+.profile-des {
+  padding: 10px;
+  margin: 10px 0px 0px 0px;
+  display: inline-block;
+  min-height: 100px;
+  width: 100%;
+  border: 1px solid #7b7b7b;
+  border-radius: 10px;
+}
+
+.profile-pic {
+  display: inline;
+  margin: 0 auto;
+  height: 100%;
+  width: 100%;
+}
+
+.profile-label {
+  display: inline-block;
+  min-width: 130px;
+  font-weight: bold;
+}
+
+.profile-button {
+  outline: 0;
+  width: 100%;
+  border: 0;
+  padding: 10px;
+  margin-bottom: 15px;
+  background: #002754;
+  color: white;
+}
+
+.profile-button:hover {
+  color: white;
+  background: #7eabd5;
+}
+
+/*Storefront*/
+.store-box {
+  padding: 10px 20px 10px 20px;
+  min-width: 70%;
+  height: 100%;
+  font-size: medium;
 }

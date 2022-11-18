@@ -39,7 +39,6 @@ def teardown_request(exception):
   except Exception as e:
     pass
 
-
 @app.route('/', methods=['GET','POST'])
 def index():
   if session.get('logged_in') == True:
@@ -54,6 +53,20 @@ def index():
     cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser")
     for result in cursor:
       products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname'],result['username']))
+    cursor.close()
+    return render_template("index.html", products = products)
+  
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
+
+#Sending search request to database
+@app.route('/search')
+def search(keyword):
+  if session.get('logged_in') == True:
+    products = []
+    cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category WHERE productname = %s", keyword)
+    for result in cursor:
+      products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname']))
     cursor.close()
     return render_template("index.html", products = products)
   
@@ -76,7 +89,6 @@ def login():
           #After successfully verifying, fetch user info from database
           cursor = g.conn.execute("SELECT * FROM cuuser NATURAL JOIN manages WHERE cuid = %s", cuid)
           user_record = cursor.fetchall()
-          print(user_record)
           cursor.close()
 
           #Store user info in session, which will be kept until log out
@@ -104,6 +116,25 @@ def logout():
   session.pop('profilepic', None)
   session.pop('store_id', None)
   return render_template('login.html')
+
+#User profile
+@app.route('/profile', methods=['GET','POST'])
+def profile():
+  if session.get('logged_in') == True:
+    
+      cursor = g.conn.execute("SELECT productname, productprice, productimage FROM cuuser NATURAL JOIN manages NATURAL JOIN listed_on NATURAL JOIN product WHERE cuid = %s", session['current_user'])
+      storefront_record = cursor.fetchall()
+      cursor.close()
+      #Default: Show all items
+      storefront_products = []
+      for result in storefront_record:
+        storefront_products.append((result['productname'],result['productprice'],result['productimage']))
+      return render_template("profile.html", storefront_products = storefront_products)
+
+  return render_template('profile.html')
+  
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
     
 #Server code for adding products to the storefront
 @app.route('/save_name', methods = ['GET', 'POST'])
@@ -116,20 +147,6 @@ def save_name():
       if 'product-image' in request.form:
           productimage = request.form['product-image']
     
-#Sending search request to database
-@app.route('/search')
-def search(keyword):
-  if session.get('logged_in') == True:
-    products = []
-    cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category WHERE productname = %s", keyword)
-    for result in cursor:
-      products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname']))
-    cursor.close()
-    return render_template("index.html", products = products)
-  
-  #Redirect to login page if user is not logged in
-  return redirect(url_for('login'))
-
 if __name__ == "__main__":
   import click
 
