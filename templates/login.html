@@ -1,12 +1,32 @@
-{% extends "application.html"%} {% block content %} {% if error %}
-<div class="alert alert-danger notification">{{error}}</div>
-{% endif %}
-<h2>Please log in:</h2>
-<form action="/login" method="post">
-  <label for="cuid">CUID:</label>
-  <input type="text" name="cuid" id="cuid" required /> <br />
-  <label for="password">Password:</label>
-  <input type="password" name="password" id="password" required /> <br />
-  <input type="submit" value="Login" />
-</form>
+{% extends "application.html"%} {% block content %}
+<div class="login-box">
+  <form action="/login" method="post" class="form">
+    <p>Please log in to purchase or list items on Columbia Buy & Sell</p>
+    {% if error %}
+    <div class="alert alert-danger notification">
+      <img
+        src="/static/warning.png"
+        height="45"
+        class="d-inline-block align-top warning-symbol"
+        alt=""
+      />
+      <span class="message">{{error}}</span>
+    </div>
+    {% endif %}
+    <label for="cuid">CUID</label>
+    <input type="text" name="cuid" id="cuid" required class="form-input" />
+    <br />
+    <label for="password">Password</label>
+    <input
+      type="password"
+      name="password"
+      id="password"
+      required
+      class="form-input"
+    />
+    <br />
+    <input type="submit" value="Login" class="form-button" />
+    <span>Don't have an account? Sign up!</span>
+  </form>
+</div>
 {% endblock %}

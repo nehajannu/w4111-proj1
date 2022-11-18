@@ -1,7 +1,19 @@
+/*General*/
+html {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
 body {
   font-size: 15pt;
   font-family: arial;
   background: white;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 a:hover {
@@ -9,29 +21,24 @@ a:hover {
 }
 
 .container {
-  padding: 10px;
+  padding: 0px;
   margin: 0px;
-}
-
-.columbia-header {
-  color: #555555;
-  background: white;
-  padding: 20px;
-  text-align: center;
-  vertical-align: center;
-  align-items: center;
-}
-
-.columbia {
-  color: #555555;
-  font-weight: bold;
-  font-size: xx-large;
-  padding-left: 10px;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .navbar {
-  background: rgb(185, 217, 235);
+  background: white;
   color: #555555;
+  border-bottom: 1px solid #cecece;
+  height: 120px;
+  font-size: large;
+}
+
+.logo {
+  justify-content: center;
 }
 
 .profile-header {
@@ -39,9 +46,74 @@ a:hover {
 }
 
 .notification {
-  width: 600px;
+  max-width: 600px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
+.message {
+  text-align: left;
+  font-size: medium;
+}
+
+.warning-symbol {
+  padding-left: 10px;
+  padding-right: 10px;
+  margin: auto;
+}
+
+/*Log in*/
+.login-box {
+  background-size: 100%;
+  background: rgb(185, 217, 235);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.form {
+  position: relative;
+  z-index: 1;
+  background: white;
+  max-width: 400px;
+  max-height: 100%;
+  margin: 0 auto;
+  padding: 45px;
+  text-align: center;
+  font-size: large;
+}
+
+.form-input {
+  outline: 0;
+  width: 100%;
+  border: 0;
+  margin: 0 0 15px;
+  padding: 15px;
+  box-sizing: border-box;
+  background: rgb(239, 239, 239);
+}
+
+.form-button {
+  outline: 0;
+  width: 100%;
+  border: 0;
+  padding: 15px;
+  margin-bottom: 15px;
+  background: #002754;
+  color: white;
+}
+
+.form-button:hover,
+.form-button:active,
+.form-button:focus {
+  background: rgb(185, 217, 235);
+  color: #002754;
+}
+
+/*Product search page*/
 .product {
   padding: 10px;
 }
