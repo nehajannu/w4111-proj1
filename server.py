@@ -2,7 +2,7 @@ import os
   # accessible as a variable in index.html:
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response, url_for, session
+from flask import Flask, request, flash, render_template, g, redirect, Response, url_for, session
 import string
 import random
 
@@ -126,13 +126,13 @@ def logout():
 @app.route('/profile', methods=['GET','POST'])
 def profile():
   if session.get('logged_in') == True:
-    cursor = g.conn.execute("SELECT productname, productprice, productimage FROM cuuser NATURAL JOIN manages NATURAL JOIN listed_on NATURAL JOIN product WHERE cuid = %s", session['current_user'])
+    cursor = g.conn.execute("SELECT productid, productname, productprice, productimage FROM cuuser NATURAL JOIN manages NATURAL JOIN listed_on NATURAL JOIN product WHERE cuid = %s", session['current_user'])
     storefront_record = cursor.fetchall()
     cursor.close()
     #Show all items that the user has listed
     storefront_products = []
     for result in storefront_record:
-      storefront_products.append((result['productname'],result['productprice'],result['productimage']))
+      storefront_products.append((result['productname'],result['productprice'],result['productimage'],result['productid']))
     return render_template("profile.html", storefront_products = storefront_products)
   
   #Redirect to login page if user is not logged in
@@ -166,9 +166,35 @@ def add_product():
       #Add product to storefront (listed_on relationship)
       cursor = g.conn.execute("INSERT INTO listed_on VALUES(%s,%s)",productid, session['storeid'])
       cursor.close()
+
+      flash('Item successfully added!','success')
       
       return redirect(url_for('profile'))
     return render_template('add_product.html')
+
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
+
+#Server code for adding products to the storefront
+@app.route('/delete_product', methods = ['GET', 'POST'])
+def delete_product():
+  if session.get('logged_in') == True:
+    if request.method == 'POST':
+      productid = request.form['delete-product']
+
+      #Remove product from category (belongs_to relationship)
+      cursor = g.conn.execute("DELETE FROM belongs_to WHERE productid = %s",productid)
+      cursor.close()
+      #Remove product from storefront (listed_on relationship)
+      cursor = g.conn.execute("DELETE FROM listed_on WHERE productid = %s",productid)
+      cursor.close()
+      #Remove product from database
+      cursor = g.conn.execute("DELETE FROM product WHERE productid = %s",productid)
+      cursor.close()
+
+      flash('Item successfully removed!','success')
+      
+      return redirect(url_for('profile'))
 
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))

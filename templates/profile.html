@@ -31,11 +31,19 @@
 <div class="store-box float-right">
   <h1>STOREFRONT</h1>
   <div class="list-product-btn-container">
+    {% with success = get_flashed_messages(category_filter=["success"]) %} {% if
+    success %}
+    <div class="alert alert-success notification">
+      <span class="message">{{success[0]}}</span>
+    </div>
+    {% endif %} {% endwith %}
+  </div>
+  <div class="list-product-btn-container">
     <a href="/add_product" class="btn list-button"
       >List products <i class="fa-solid fa-plus"></i
     ></a>
   </div>
-  <div class="row card-group">
+  <div class="row card-group store-card-group">
     {% for product in storefront_products %}
     <div class="col-4">
       <div class="card product">
@@ -47,9 +55,17 @@
         <div class="card-body">
           <div class="card-title">{{product[0].upper()}}</div>
           <div class="card-text">${{product[1]}}</div>
-          <a href="#" class="btn delete-button"
-            >Delete <i class="fa-solid fa-trash"></i
-          ></a>
+          <form method="POST" action="/delete_product">
+            <input
+              type="hidden"
+              value="{{product[3]}}"
+              id="delete-product"
+              name="delete-product"
+            />
+            <button type="submit" class="delete-button" title="delete-button">
+              Delete <i class="fa-solid fa-trash"></i>
+            </button>
+          </form>
         </div>
       </div>
     </div>
