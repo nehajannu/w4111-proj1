@@ -198,6 +198,40 @@ def delete_product():
 
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
+
+  #server code adding products to the cart 
+  @app.route('/add', methods=['POST'])
+  def add_product_to_cart():
+    cursor = None
+	try:
+		_id = request.form['product-id']
+		# validate the received values
+		if _code and request.method == 'POST':
+			conn = mysql.connect()
+			cursor = conn.cursor(pymysql.cursors.DictCursor)
+			cursor.execute("SELECT * FROM Product WHERE product-id=%s", _id)
+			row = cursor.fetchone()
+			
+			itemArray = { row['product-id'] : {'name' : row['product-name'], 'id' : row['product-id'], 'price' : row['product-price'], 'image' : row['product-image']}}
+			
+			all_total_price = 0
+
+				for key, value in session['cart_item'].items():
+					individual_price = float(session['cart_item'][key]['total_price'])
+					all_total_price = all_total_price + individual_price
+			
+			session['all_total_price'] = all_total_price
+			
+			return redirect(url_for('profile'))
+      return render_template('add_product.html')
+    
+		else:			
+			return 'Error while adding item to cart'
+	except Exception as e:
+		print(e)
+	finally:
+		cursor.close() 
+		conn.close()
     
 if __name__ == "__main__":
   import click
