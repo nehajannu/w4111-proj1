@@ -41,6 +41,11 @@ def teardown_request(exception):
   except Exception as e:
     pass
 
+#Generate random id for store, product, and order
+def id_generator(length=10, c=string.digits):
+  return ''.join(random.choice(c) for _ in range(length))
+
+#Home page or search product page
 @app.route('/', methods=['GET','POST'])
 def index():
   if session.get('logged_in') == True:
@@ -120,7 +125,9 @@ def logout():
   return render_template('login.html')
 
 #Creating a new account
-
+@app.route('/signup', methods=['GET','POST'])
+def signup():
+  return render_template("signup.html")
 
 #User profile
 @app.route('/profile', methods=['GET','POST'])
@@ -139,11 +146,28 @@ def profile():
   return redirect(url_for('login'))
 
 #Update user profile
+@app.route('/settings', methods=['GET','POST'])
+def settings():
+  if session.get('logged_in') == True:
+    return render_template("signup.html")
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
 
+#Add payment method
+@app.route('/payment', methods=['GET','POST'])
+def payment():
+  if session.get('logged_in') == True:
+    return render_template("payment.html")
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
 
-#Generate random id for store, product, and order
-def id_generator(length=10, c=string.digits):
-  return ''.join(random.choice(c) for _ in range(length))
+#Shopping cart
+@app.route('/cart', methods=['GET','POST'])
+def cart():
+  if session.get('logged_in') == True:
+    return render_template("cart.html")
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
 
 #Server code for adding products to the storefront
 @app.route('/add_product', methods = ['GET', 'POST'])
