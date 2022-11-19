@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <title>Your Cart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="static/bootstrap.min.css" rel="stylesheet" media="screen" />
+  </head>
+
+  <div class="product-item">
+    <form method="post" action="/add">
+      <div class="product-image">
+        <img src="/static/images/{{ product.image }}" title="product-image" />
+      </div>
+      <div class="product-tile-footer">
+        <div class="product-name">{{ product.product-name }}</div>
+        <div class="product-price">₹ {{ product.product-price }}</div>
+        <div class="product-description">
+          ₹ {{ product.product-description }}
+        </div>
+        <div class="product-image">₹ {{ product.product-image }}</div>
+        <div class="cart-action">
+          <input type="submit" value="Add to Cart" class="btnAddAction" />
+        </div>
+      </div>
+    </form>
+  </div>
+</html>

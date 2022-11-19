@@ -161,6 +161,14 @@ def payment():
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
+#Shopping cart
+@app.route('/cart', methods=['GET','POST'])
+def cart():
+  if session.get('logged_in') == True:
+    return render_template("cart.html")
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
+
 #Server code for adding products to the storefront
 @app.route('/add_product', methods = ['GET', 'POST'])
 def add_product():
