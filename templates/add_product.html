@@ -1,0 +1,59 @@
+{% extends "application.html"%} {% block content %}
+<div class="add-product-box">
+  <form action="/add_product" method="post" class="add-form">
+    <p>Add a product to your storefront so you can sell it!</p>
+    <label for="product-name">Product name</label><br />
+    <input
+      type="text"
+      name="product-name"
+      id="product-name"
+      class="add-form-input"
+      required
+    />
+    <label for="product-price">Product price</label><br />
+    <input
+      type="float"
+      name="product-price"
+      id="product-price"
+      class="add-form-input"
+      required
+    />
+    <label for="product-category">Select a product category</label><br />
+    <select
+      id="product-category"
+      name="product-category"
+      class="add-form-input"
+      required
+    >
+      <option value="18405">Books</option>
+      <option value="19576">Furnitures</option>
+      <option value="19587">Tops</option>
+      <option value="15840">Bottoms</option>
+      <option value="19469">Dresses</option>
+      <option value="14960">Cooking Utensils</option>
+      <option value="19405">Electronics</option>
+      <option value="16840">Home Decor</option>
+      <option value="19503">Shoes</option>
+      <option value="19403">Storage</option>
+      <option value="00000">Others</option>
+    </select>
+    <label for="product-image">Product image (URL)</label><br />
+    <input
+      type="text"
+      name="product-image"
+      id="product-image"
+      class="add-form-input"
+      required
+    />
+    <label for="product-description">Product description</label><br />
+    <input
+      type="text"
+      name="product-description"
+      id="product-description"
+      class="add-form-input"
+      required
+    />
+    <input type="submit" value="Add Product" class="add-form-button" />
+  </form>
+</div>
+{% endblock %}

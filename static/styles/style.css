@@ -256,7 +256,7 @@ a:hover {
 
 .profile-box {
   padding: 10px 20px 10px 20px;
-  max-width: 23%;
+  max-width: 25%;
   height: 100%;
   font-size: medium;
   background: linear-gradient(to bottom, rgb(185, 217, 235) 30%, white 30%);
@@ -322,6 +322,97 @@ a:hover {
 .store-box {
   padding: 10px 20px 10px 20px;
   min-width: 70%;
+  max-width: 100%;
   height: 100%;
   font-size: medium;
+}
+
+.delete-button {
+  outline: 0;
+  width: 100%;
+  border: 0;
+  padding: 10px;
+  margin-bottom: 15px;
+  background: rgb(225, 97, 97);
+  color: white;
+}
+
+.delete-button:hover {
+  color: white;
+  background: rgb(199, 58, 58);
+}
+
+.list-product-btn-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.list-button {
+  outline: 0;
+  width: 200px;
+  border: 0;
+  padding: 10px;
+  margin-bottom: 15px;
+  background: #002754;
+  color: white;
+}
+
+.list-button:hover {
+  color: white;
+  background: #7eabd5;
+}
+
+.storefront-product-image {
+  width: 250px;
+  height: 250px;
+}
+
+/*Add product*/
+.add-product-box {
+  background-size: 100%;
+  background: rgb(185, 217, 235);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  font-size: medium;
+}
+
+.add-form {
+  position: relative;
+  z-index: 1;
+  background: white;
+  max-width: 600px;
+  max-height: 100%;
+  margin: 0 auto;
+  padding: 45px;
+  text-align: center;
+}
+
+.add-form-input {
+  outline: 0;
+  width: 100%;
+  border: 0;
+  margin: 0 0 15px;
+  padding: 15px;
+  box-sizing: border-box;
+  background: rgb(239, 239, 239);
+}
+
+.add-form-button {
+  outline: 0;
+  width: 100%;
+  border: 0;
+  padding: 15px;
+  background: #002754;
+  color: white;
+}
+
+.add-form-button:hover,
+.add-form-button:active,
+.add-form-button:focus {
+  background: rgb(185, 217, 235);
+  color: #002754;
 }
