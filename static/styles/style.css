@@ -319,6 +319,15 @@ a:hover {
   background: #7eabd5;
 }
 
+/*Payment*/
+.payment-box {
+  padding: 10px 20px 10px 20px;
+  width: 100%;
+  height: 100%;
+  font-size: medium;
+  margin: 0;
+}
+
 /*Storefront*/
 .store-box {
   padding: 10px 20px 10px 20px;
