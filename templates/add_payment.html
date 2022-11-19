@@ -1,0 +1,33 @@
+{% extends "application.html"%} {% block content %}
+<div class="login-box">
+  <form action="/login" method="post" class="form">
+    <h1>Please enter your payment information</h1>
+    <label for="creditcardholder">Cardholder</label>
+    <input
+      type="text"
+      name="creditcardholder"
+      id="creditcardholder"
+      required
+      class="form-input"
+    />
+    <br />
+    <label for="creditcardno">Card Number</label>
+    <input
+      type="text"
+      name="creditcardno"
+      id="creditcardno"
+      required
+      class="form-input"
+    /><br />
+    <label for="creditcardexpdate">Card Number</label>
+    <input
+      type="date"
+      name="creditcardexpdate"
+      id="creditcardexpdate"
+      required
+      class="form-input"
+    /><br />
+    <input type="submit" value="Add payment method" class="form-button" />
+  </form>
+</div>
+{% endblock %}

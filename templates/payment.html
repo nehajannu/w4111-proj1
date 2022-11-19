@@ -1,5 +1,27 @@
 {% extends "application.html"%} {% block content %}
 <div class="payment-box">
   <h1>PAYMENT METHODS</h1>
+  <div class="list-product-btn-container">
+    {% with success = get_flashed_messages(category_filter=["success"]) %} {% if
+    success %}
+    <div class="alert alert-success notification">
+      <span class="message">{{success[0]}}</span>
+    </div>
+    {% endif %} {% endwith %}
+  </div>
+
+  {% for payment in payment_methods %}
+  <div>
+    <div>{{payment[0]}}</div>
+    <div>{{payment[1]}}</div>
+    <div>{{payment[2]}}</div>
+  </div>
+  {% endfor %}
+
+  <div class="list-product-btn-container">
+    <a href="/add_payment" class="btn list-button"
+      >Add payment method <i class="fa-solid fa-plus"></i
+    ></a>
+  </div>
 </div>
 {% endblock %}

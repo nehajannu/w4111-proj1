@@ -153,11 +153,29 @@ def settings():
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
-#Add payment method
+#View payment method
 @app.route('/payment', methods=['GET','POST'])
 def payment():
   if session.get('logged_in') == True:
-    return render_template("payment.html")
+    cursor = g.conn.execute("SELECT * FROM payment NATURAL JOIN has WHERE cuid = %s", session['current_user'])
+    payment_record = cursor.fetchall()
+    cursor.close()
+    print(payment_record)
+
+    #Show all payment methods that the user has added
+    payment_methods = []
+    for result in payment_record:
+      payment_methods.append((result['creditcardno'],result['creditcardholder'],result['creditcardexpdate']))
+    return render_template("payment.html", payment_methods = payment_methods)
+
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
+
+#Add payment method
+@app.route('/add_payment', methods=['GET','POST'])
+def add_payment():
+  if session.get('logged_in') == True:
+    return render_template("add_payment.html")
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
@@ -166,6 +184,14 @@ def payment():
 def cart():
   if session.get('logged_in') == True:
     return render_template("cart.html")
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
+
+#Past orders
+@app.route('/past_orders', methods=['GET','POST'])
+def past_orders():
+  if session.get('logged_in') == True:
+    return render_template("past_orders.html")
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
