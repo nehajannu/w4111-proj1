@@ -222,6 +222,23 @@ def delete_product():
 
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
+
+  #Server Code for Price Filter 
+  @app.route("/pricefilter",methods=["POST","GET"])
+  def pricefilter():
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    if request.method == 'POST':
+        query = request.form['action']
+        minimum_price = request.form['minimum_price']
+        maximum_price = request.form['maximum_price']
+        #print(query)
+        if query == '':
+            cur.execute("SELECT * FROM product ORDER BY product-name ASC")
+            productlist = cur.fetchall()
+            print('all list')
+        else:
+            cur.execute("SELECT * FROM product WHERE product-price BETWEEN (%s) AND (%s)", [minimum_price, maximum_price])
+            productlist = cur.fetchall()  
     
 if __name__ == "__main__":
   import click
