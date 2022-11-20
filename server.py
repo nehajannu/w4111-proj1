@@ -76,6 +76,18 @@ def search(keyword):
       products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname']))
     cursor.close()
     return render_template("index.html", products = products)
+  #filtering by category 
+    keyword_string = search.data['keyword']
+    if keyword_string['select'] == 'tops':
+      qry = db_session.query(Product, tops).filter(
+                tops.category-id==Product.category-id).filter(
+                    tops.category-id.contains(keyword_string))
+            results = [item[0] for item in qry.all()]
+    else search.data['select'] == 'furniture':
+            qry = db_session.query(furniture).filter(
+                furniture.category-id.contains(search_string))
+            results = qry.all()
+    # not too sure if the above server code works for filtering by category 
   
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
