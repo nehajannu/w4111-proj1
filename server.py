@@ -76,18 +76,17 @@ def search(keyword):
       products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname']))
     cursor.close()
     return render_template("index.html", products = products)
-  #filtering by category 
-    keyword_string = search.data['keyword']
-    if keyword_string['select'] == 'tops':
-      qry = db_session.query(Product, tops).filter(
-                tops.category-id==Product.category-id).filter(
-                    tops.category-id.contains(keyword_string))
-            results = [item[0] for item in qry.all()]
-    else search.data['select'] == 'furniture':
-            qry = db_session.query(furniture).filter(
-                furniture.category-id.contains(search_string))
-            results = qry.all()
-    # not too sure if the above server code works for filtering by category 
+ 
+ #filtering by category  
+@app.route('/categoryfilter')
+def categoryfilter(keyword):
+  if session.get('logged_in') == True:
+    category_products = []
+    cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category WHERE category = %s", keyword)
+    for result in cursor:
+      category_products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname']))
+    cursor.close()
+    return render_template("index.html", category_products = category_products)
   
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
