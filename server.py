@@ -159,11 +159,6 @@ def logout():
   session.pop('store_id', None)
   return render_template('login.html')
 
-#Creating a new account
-@app.route('/signup', methods=['GET','POST'])
-def signup():
-  return render_template("signup.html")
-
 #User profile
 @app.route('/profile', methods=['GET','POST'])
 def profile():
