@@ -1,7 +1,7 @@
 {% extends "application.html"%} {% block content %}
 <div class="input-group">
   <div class="form-outline">
-    <form method="POST" action="/index">
+    <form method="POST" action="">
       <label for="keyword" class="search-label">Search</label>
       <input class="search-input" type="text" id="keyword" name="keyword" />
       <label for="category-filter" class="search-label"
@@ -69,7 +69,17 @@
       <div class="card-body">
         <div class="card-title">{{product[0].upper()}}</div>
         <div class="card-text">${{product[1]}}</div>
-        <div class="card-text">{{product[4]}}</div>
+        <form method="post" action="/storefront">
+          <input
+            type="hidden"
+            value="{{product[7]}}"
+            id="seller"
+            name="seller"
+          />
+          <button type="submit" class="seller-btn" title="productid">
+            {{product[4]}}
+          </button>
+        </form>
         <form method="POST" action="/add_cart">
           <input
             type="hidden"

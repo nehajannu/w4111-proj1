@@ -81,6 +81,15 @@ a:hover {
   margin-right: 5px;
 }
 
+.seller-btn {
+  outline: 0;
+  width: 100%;
+  border: 0;
+  background: white;
+  color: #7eabd5;
+  font-size: large;
+}
+
 /*Log in*/
 .login-box {
   background-size: 100%;
