@@ -1,0 +1,18 @@
+{% extends "application.html"%} {% block content %}
+<div class="login-box">
+  <form action="/checkout" method="post" class="form">
+    <label for="payment-method">Please select a payment method</label><br />
+    <select
+      id="payment-method"
+      name="payment-method"
+      class="add-form-input"
+      required
+    >
+      {% for card in cards %}
+      <option value="{{card}}">Card {{card}}</option>
+      {% endfor %}
+    </select>
+    <input type="submit" value="Confirm Order" class="form-button" />
+  </form>
+</div>
+{% endblock %}
