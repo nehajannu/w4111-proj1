@@ -52,7 +52,7 @@ def index():
   if session.get('logged_in') == True:
     #Handle search request
     if request.method == "POST":
-      keyword = request.form['keyword']
+      keyword = request.form['keyword'].lower().strip()
       category_filter = request.form['category-filter']
       price_sort = request.form['price-sort']
       return search(keyword, category_filter, price_sort)
@@ -80,6 +80,7 @@ def search(keyword, category_filter, price_sort):
         cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser ORDER BY \"productprice\" ASC")
       #keyword is filled but not category
       elif category_filter == "all":
+        print(keyword)
         cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser WHERE productname = %s ORDER BY \"productprice\" ASC", keyword)
       #category is filled but not keyword
       elif keyword == "":
@@ -449,7 +450,7 @@ def add_product():
   if session.get('logged_in') == True:
     if request.method == 'POST':
       productid = id_generator()
-      productname = request.form['product-name']
+      productname = request.form['product-name'].lower().strip()
       productprice = request.form['product-price']
       productdescription = request.form['product-description']
       productimage = request.form['product-image']
