@@ -131,6 +131,7 @@ def login():
           #Store user info in session, which will be kept until log out
           session['logged_in'] = True
           session['current_user'] = cuid
+          session['password'] = password
           user_info = user_record[0]
           session['username'] = user_info['username']
           session['userdescription'] = user_info['userdescription']
@@ -181,7 +182,29 @@ def profile():
 @app.route('/settings', methods=['GET','POST'])
 def settings():
   if session.get('logged_in') == True:
-    return render_template("signup.html")
+    if request.method == 'POST':
+      #Update user information
+      username = request.form['username']
+      password = request.form['password']
+      userdescription = request.form['userdescription']
+      profilepic = request.form['profilepic']
+      cursor = g.conn.execute("UPDATE cuuser SET username =%s, password=%s, userdescription=%s, profilepic=%s WHERE cuid = %s", username, password, userdescription, profilepic, session['current_user'])
+      cursor.close()
+      session['username'] = username
+      session['password'] = password
+      session['userdescription'] = userdescription
+      session['profilepic'] = profilepic
+
+      #Show all items that the user has listed
+      cursor = g.conn.execute("SELECT productid, productname, productprice, productimage FROM cuuser NATURAL JOIN manages NATURAL JOIN listed_on NATURAL JOIN product WHERE cuid = %s", session['current_user'])
+      storefront_record = cursor.fetchall()
+      cursor.close()
+      storefront_products = []
+      for result in storefront_record:
+        storefront_products.append((result['productname'],result['productprice'],result['productimage'],result['productid']))
+      return render_template("profile.html", storefront_products = storefront_products)
+    return render_template("settings.html")
+
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 

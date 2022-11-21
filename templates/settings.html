@@ -1,6 +1,6 @@
 {% extends "application.html"%} {% block content %}
 <div class="add-product-box">
-  <form action="/add_product" method="post" class="add-form">
+  <form action="/settings" method="post" class="add-form">
     <p>Edit your profile</p>
     <label for="username">Name</label><br />
     <input
@@ -9,6 +9,33 @@
       id="username"
       class="add-form-input"
       value="{{session['username']}}"
+      required
+    />
+    <label for="password">Password</label><br />
+    <input
+      type="text"
+      name="password"
+      id="password"
+      class="add-form-input"
+      value="{{session['password']}}"
+      required
+    />
+    <label for="userdescription">Description</label><br />
+    <input
+      type="text"
+      name="userdescription"
+      id="userdescription"
+      class="add-form-input"
+      value="{{session['userdescription']}}"
+      required
+    />
+    <label for="profilepic">Profile Pic (URL)</label><br />
+    <input
+      type="text"
+      name="profilepic"
+      id="profilepic"
+      class="add-form-input"
+      value="{{session['profilepic']}}"
       required
     />
     <input type="submit" value="Edit Profile" class="add-form-button" />

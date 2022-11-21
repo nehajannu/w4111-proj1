@@ -439,10 +439,10 @@ a:hover {
 
 /*Add product*/
 .add-product-box {
-  background-size: 100%;
+  background-size: 200%;
   background: rgb(185, 217, 235);
   width: 100%;
-  height: 100%;
+  height: 200%;
   display: flex;
   justify-content: center;
   text-align: center;
