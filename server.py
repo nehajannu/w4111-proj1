@@ -310,19 +310,24 @@ def delete_product():
   #Server Code for Price Filter 
   @app.route("/pricefilter",methods=["POST","GET"])
   def pricefilter():
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    if request.method == 'POST':
+    if session.get('logged_in') == True:
+      cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+      if request.method == 'POST':
         query = request.form['action']
         minimum_price = request.form['minimum_price']
         maximum_price = request.form['maximum_price']
         #print(query)
         if query == '':
-            cur.execute("SELECT * FROM product ORDER BY product-name ASC")
-            productlist = cur.fetchall()
-            print('all list')
+          cur.execute("SELECT * FROM product ORDER BY product-name ASC")
+          productlist = cur.fetchall()
+          cursor.close()
+          print('all list')
         else:
-            cur.execute("SELECT * FROM product WHERE product-price BETWEEN (%s) AND (%s)", [minimum_price, maximum_price])
-            productlist = cur.fetchall()  
+          cur.execute("SELECT * FROM product WHERE product-price BETWEEN (%s) AND (%s)", [minimum_price, maximum_price])
+          productlist = cur.fetchall()  
+          cursor.close()
+          
+        return render_template("index.html")
     
 if __name__ == "__main__":
   import click
