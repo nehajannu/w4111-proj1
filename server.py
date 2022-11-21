@@ -139,6 +139,7 @@ def login():
           session['storeid'] = user_info['storeid']
           session['cart'] = []
           session['total_price'] = 0
+          session['profit'] = 0
           return redirect(url_for('index'))
         else:
           error = 'Invalid cuid or password. Please try again'
@@ -166,13 +167,21 @@ def signup():
 @app.route('/profile', methods=['GET','POST'])
 def profile():
   if session.get('logged_in') == True:
+    #Show all items that the user has listed
     cursor = g.conn.execute("SELECT productid, productname, productprice, productimage FROM cuuser NATURAL JOIN manages NATURAL JOIN listed_on NATURAL JOIN product WHERE cuid = %s", session['current_user'])
     storefront_record = cursor.fetchall()
     cursor.close()
-    #Show all items that the user has listed
+    
     storefront_products = []
     for result in storefront_record:
       storefront_products.append((result['productname'],result['productprice'],result['productimage'],result['productid']))
+
+    #Calculate the profit that a user has made
+    cursor = g.conn.execute("SELECT productprice FROM manages NATURAL JOIN listed_on NATURAL JOIN product WHERE cuid = %s and sold = true", session['current_user'])
+    total_profit = cursor.fetchall()
+    cursor.close()
+    session['profit'] = sum(profit[0] for profit in total_profit)
+
     return render_template("profile.html", storefront_products = storefront_products)
   
   #Redirect to login page if user is not logged in
@@ -215,11 +224,12 @@ def payment():
     cursor = g.conn.execute("SELECT * FROM payment NATURAL JOIN has WHERE cuid = %s", session['current_user'])
     payment_record = cursor.fetchall()
     cursor.close()
-
+    
     #Show all payment methods that the user has added
     payment_methods = []
     for result in payment_record:
       payment_methods.append((result['creditcardno'],result['creditcardholder'],result['creditcardexpdate']))
+
     return render_template("payment.html", payment_methods = payment_methods)
 
   #Redirect to login page if user is not logged in
@@ -265,6 +275,14 @@ def delete_payment():
     if request.method == 'POST':
       creditcardno = request.form['delete-payment']
 
+      #Prevent deletion if there is only one payment method left
+      cursor = g.conn.execute("SELECT * FROM payment NATURAL JOIN has WHERE cuid = %s", session['current_user'])
+      payment_record = cursor.fetchall()
+      cursor.close()
+      if len(payment_record) <= 1:
+        flash('Cannot delete your only payment method','error')
+        return redirect(url_for('payment'))
+
       #Remove payment from user (has relationship)
       cursor = g.conn.execute("DELETE FROM has WHERE creditcardno = %s",creditcardno)
       cursor.close()
@@ -273,7 +291,6 @@ def delete_payment():
       cursor.close()
 
       flash('Payment successfully removed!','success')
-      
       return redirect(url_for('payment'))
 
   #Redirect to login page if user is not logged in
