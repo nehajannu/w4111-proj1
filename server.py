@@ -60,7 +60,7 @@ def index():
     products = []
     cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser")
     for result in cursor:
-      products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname'],result['username']))
+      products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname'],result['username'],result['productid'],result['sold']))
     cursor.close()
     return render_template("index.html", products = products)
   
@@ -72,9 +72,9 @@ def index():
 def search(keyword):
   if session.get('logged_in') == True:
     products = []
-    cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category WHERE productname = %s", keyword)
+    cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser WHERE productname = %s", keyword)
     for result in cursor:
-      products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname']))
+      products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname'], result['username'],result['productid'],result['sold']))
     cursor.close()
     return render_template("index.html", products = products)
  
@@ -118,6 +118,8 @@ def login():
           session['userdescription'] = user_info['userdescription']
           session['profilepic'] = user_info['profilepic']
           session['storeid'] = user_info['storeid']
+          session['cart'] = []
+          session['total_price'] = 0
           return redirect(url_for('index'))
         else:
           error = 'Invalid cuid or password. Please try again'
@@ -240,7 +242,124 @@ def delete_payment():
 @app.route('/cart', methods=['GET','POST'])
 def cart():
   if session.get('logged_in') == True:
-    return render_template("cart.html")
+    #Fetch all the products in cart by productid 
+    in_cart = session['cart']
+    cart = []
+    for pid in in_cart:
+      cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category WHERE productid = %s", pid)
+      record = cursor.fetchall()
+      cursor.close()
+      result = record[0]
+      cart.append((result['productname'],result['productprice'],result['productimage'],result['productid']))
+
+    return render_template("cart.html", cart=cart)
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
+
+@app.route('/add_cart', methods=['GET','POST'])
+def add_cart():
+  if session.get('logged_in') == True:
+    #Save the product ids in session
+    to_add = request.form['productid']
+    in_cart = session['cart']
+    #First check if the product is already added. if yes, stay on the index page with error message
+    if to_add in in_cart:
+      flash('This item is already in your cart','error')
+      return redirect(url_for('index'))
+    #Then check whether the product is sold by yourself. if yes prevent user from adding it into their cart
+    cursor = g.conn.execute('SELECT * FROM listed_on WHERE productid = %s', to_add)
+    same_store = cursor.fetchall()
+    cursor.close()
+    if same_store[0]['storeid'] == session['storeid']:
+      flash('You cannot buy your own product','error')
+      return redirect(url_for('index'))
+
+    in_cart.append(to_add)
+    session['cart'] = in_cart
+
+    #Fetch all the products in cart by productid 
+    cart = []
+    price = 0
+    for pid in in_cart:
+      cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category WHERE productid = %s", pid)
+      record = cursor.fetchall()
+      cursor.close()
+      result = record[0]
+      cart.append((result['productname'],result['productprice'],result['productimage'],result['productid']))
+      price += int(result['productprice'])
+
+    session['total_price'] = price
+    return render_template("cart.html", cart=cart)
+
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
+
+#Delete item in cart
+@app.route('/delete_cart', methods=['GET','POST'])
+def delete_cart():
+  if session.get('logged_in') == True:
+    to_delete = request.form['productid']
+    in_cart = session['cart']
+    in_cart.remove(to_delete)
+    session['cart'] = in_cart
+
+    #Fetch all the products in cart by productid 
+    cart = []
+    price = 0
+    for pid in in_cart:
+      cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category WHERE productid = %s", pid)
+      record = cursor.fetchall()
+      cursor.close()
+      result = record[0]
+      cart.append((result['productname'],result['productprice'],result['productimage'],result['productid']))
+      price += int(result['productprice'])
+
+    session['total_price'] = price
+
+    return render_template("cart.html",cart = cart)
+
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
+
+#Checkout an order
+@app.route('/checkout', methods=['GET','POST'])
+def checkout():
+  if session.get('logged_in') == True:
+    if request.method == 'GET':
+      cursor = g.conn.execute("SELECT * FROM payment NATURAL JOIN has WHERE cuid = %s", session['current_user'])
+      payment_record = cursor.fetchall()
+      cursor.close()
+
+      #Show all payment methods that the user has added
+      payment_methods = []
+      for result in payment_record:
+        payment_methods.append((result['creditcardno']))
+      
+      return render_template("checkout.html", cards = payment_methods)
+    
+    #POST request to add order
+    orderid = id_generator()
+    cart = session['cart']
+    orderitemcount = len(cart)
+    ordertotalprice = session['total_price']
+    dateordered = str(datetime.datetime.now().date())
+    cursor = g.conn.execute("INSERT INTO order_placed VALUES(%s,%s,%s,%s,%s)",orderid,orderitemcount,ordertotalprice,dateordered,session['current_user'])
+    cursor.close()
+
+    #Mark the products in this order as sold and record them as belonging to a specific order (adds_to relationship)
+    for pid in cart:
+      cursor = g.conn.execute("UPDATE product SET sold = true WHERE productid = %s", pid)
+      cursor.close()
+      cursor = g.conn.execute("INSERT INTO adds_to VALUES(%s,%s)",pid,orderid)
+      cursor.close()
+
+    #Clear cart after ordering
+    session['cart'] = []
+    session['total_price'] = 0
+
+    flash('Successfully placed order!','success')
+    return redirect(url_for('past_orders'))
+
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
@@ -248,7 +367,21 @@ def cart():
 @app.route('/past_orders', methods=['GET','POST'])
 def past_orders():
   if session.get('logged_in') == True:
-    return render_template("past_orders.html")
+    cursor = g.conn.execute('SELECT * FROM order_placed WHERE cuid = %s ORDER BY dateordered DESC',session['current_user'])
+    order_record = cursor.fetchall()
+    cursor.close()
+
+    orders = []
+    for result in order_record:
+      #Get the product names that belong to each order
+      cursor = g.conn.execute('SELECT * FROM adds_to NATURAL JOIN product WHERE orderid = %s',result['orderid'])
+      products_in_order = cursor.fetchall()
+      cursor.close()
+      print(products_in_order)
+
+      orders.append((result['orderid'],result['orderitemcount'],result['ordertotalprice'],result['dateordered'],products_in_order))
+    return render_template("past_orders.html", orders=orders)
+
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
