@@ -5,6 +5,7 @@ from sqlalchemy.pool import NullPool
 from flask import Flask, request, flash, render_template, g, redirect, Response, url_for, session
 import string
 import random
+import datetime
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
@@ -76,18 +77,17 @@ def search(keyword):
       products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname']))
     cursor.close()
     return render_template("index.html", products = products)
-  #filtering by category 
-    keyword_string = search.data['keyword']
-    if keyword_string['select'] == 'tops':
-      qry = db_session.query(Product, tops).filter(
-                tops.category-id==Product.category-id).filter(
-                    tops.category-id.contains(keyword_string))
-            results = [item[0] for item in qry.all()]
-    else search.data['select'] == 'furniture':
-            qry = db_session.query(furniture).filter(
-                furniture.category-id.contains(search_string))
-            results = qry.all()
-    # not too sure if the above server code works for filtering by category 
+ 
+ #filtering by category  
+@app.route('/categoryfilter')
+def categoryfilter(keyword):
+  if session.get('logged_in') == True:
+    category_products = []
+    cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category WHERE category = %s", keyword)
+    for result in cursor:
+      category_products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname']))
+    cursor.close()
+    return render_template("index.html", category_products = category_products)
   
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
@@ -165,11 +165,74 @@ def settings():
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
-#Add payment method
+#View payment method
 @app.route('/payment', methods=['GET','POST'])
 def payment():
   if session.get('logged_in') == True:
-    return render_template("payment.html")
+    cursor = g.conn.execute("SELECT * FROM payment NATURAL JOIN has WHERE cuid = %s", session['current_user'])
+    payment_record = cursor.fetchall()
+    cursor.close()
+
+    #Show all payment methods that the user has added
+    payment_methods = []
+    for result in payment_record:
+      payment_methods.append((result['creditcardno'],result['creditcardholder'],result['creditcardexpdate']))
+    return render_template("payment.html", payment_methods = payment_methods)
+
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
+
+#Add payment method
+@app.route('/add_payment', methods=['GET','POST'])
+def add_payment():
+  if session.get('logged_in') == True:
+    if request.method == 'POST':
+      creditcardno = request.form['creditcardno']
+      creditcardholder = request.form['creditcardholder']
+      creditcardexpdate = request.form['creditcardexpdate']
+
+      #Make sure the same card number doesn't already exist for the user
+      cursor = g.conn.execute("SELECT * FROM payment NATURAL JOIN has WHERE cuid = %s", session['current_user'])
+      payment_record = cursor.fetchall()
+      cursor.close()
+
+      for result in payment_record:
+        if result['creditcardno'] == creditcardno:
+          return render_template('add_payment.html', error= "Cannot add the same card number twice")
+    
+      #Add credit card to database
+      cursor = g.conn.execute("INSERT INTO payment VALUES(%s,%s,%s)",creditcardno, creditcardholder, creditcardexpdate)
+      cursor.close()
+      #Add credit card to user (has relationship)
+      cursor = g.conn.execute("INSERT INTO has VALUES(%s,%s)",creditcardno,session['current_user'])
+      cursor.close()
+
+      flash('Payment method successfully added!','success')
+      
+      return redirect(url_for('payment'))
+    return render_template('add_payment.html')
+
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
+
+#Delete payment method
+@app.route('/delete_payment', methods = ['GET', 'POST'])
+def delete_payment():
+  if session.get('logged_in') == True:
+    if request.method == 'POST':
+      creditcardno = request.form['delete-payment']
+
+      #Remove payment from user (has relationship)
+      cursor = g.conn.execute("DELETE FROM has WHERE creditcardno = %s",creditcardno)
+      cursor.close()
+      #Remove payment from database
+      cursor = g.conn.execute("DELETE FROM payment WHERE creditcardno = %s",creditcardno)
+      cursor.close()
+
+      flash('Payment successfully removed!','success')
+      
+      return redirect(url_for('payment'))
+
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
@@ -178,6 +241,14 @@ def payment():
 def cart():
   if session.get('logged_in') == True:
     return render_template("cart.html")
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
+
+#Past orders
+@app.route('/past_orders', methods=['GET','POST'])
+def past_orders():
+  if session.get('logged_in') == True:
+    return render_template("past_orders.html")
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
@@ -211,7 +282,7 @@ def add_product():
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
-#Server code for adding products to the storefront
+#Server code for deleting products to the storefront
 @app.route('/delete_product', methods = ['GET', 'POST'])
 def delete_product():
   if session.get('logged_in') == True:
@@ -234,6 +305,28 @@ def delete_product():
 
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
+
+  #Server Code for Price Filter 
+  @app.route("/pricefilter",methods=["POST","GET"])
+  def pricefilter():
+    if session.get('logged_in') == True:
+      cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+      if request.method == 'POST':
+        query = request.form['action']
+        minimum_price = request.form['minimum_price']
+        maximum_price = request.form['maximum_price']
+        #print(query)
+        if query == '':
+          cur.execute("SELECT * FROM product ORDER BY product-name ASC")
+          productlist = cur.fetchall()
+          cursor.close()
+          print('all list')
+        else:
+          cur.execute("SELECT * FROM product WHERE product-price BETWEEN (%s) AND (%s)", [minimum_price, maximum_price])
+          productlist = cur.fetchall()  
+          cursor.close()
+          
+        return render_template("index.html")
     
 if __name__ == "__main__":
   import click
