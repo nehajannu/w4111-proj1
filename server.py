@@ -53,8 +53,9 @@ def index():
     #Handle search request
     if request.method == "POST":
       keyword = request.form['keyword']
-      if keyword != "":
-        return search(keyword)
+      category_filter = request.form['category_filter']
+      price_sort = request.form['price_sort']
+      return search(keyword,category_filter,price_sort)
 
     #Default: Show all items
     products = []
@@ -69,26 +70,15 @@ def index():
 
 #Sending search request to database
 @app.route('/search')
-def search(keyword):
+def search(keyword, category_filter, price_sort):
   if session.get('logged_in') == True:
     products = []
-    cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser WHERE productname = %s", keyword)
+    cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser WHERE productname = %s AND categoryname = %s ORDER BY price %s", keyword, category_filter, price_sort)
     for result in cursor:
       products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname'], result['username'],result['productid'],result['sold']))
     cursor.close()
     return render_template("index.html", products = products)
- 
- #filtering by category  
-@app.route('/categoryfilter')
-def categoryfilter(keyword):
-  if session.get('logged_in') == True:
-    category_products = []
-    cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category WHERE category = %s", keyword)
-    for result in cursor:
-      category_products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname']))
-    cursor.close()
-    return render_template("index.html", category_products = category_products)
-  
+
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
@@ -438,28 +428,6 @@ def delete_product():
 
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
-
-  #Server Code for Price Filter 
-  @app.route("/pricefilter",methods=["POST","GET"])
-  def pricefilter():
-    if session.get('logged_in') == True:
-      cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-      if request.method == 'POST':
-        query = request.form['action']
-        minimum_price = request.form['minimum_price']
-        maximum_price = request.form['maximum_price']
-        #print(query)
-        if query == '':
-          cur.execute("SELECT * FROM product ORDER BY product-name ASC")
-          productlist = cur.fetchall()
-          cursor.close()
-          print('all list')
-        else:
-          cur.execute("SELECT * FROM product WHERE product-price BETWEEN (%s) AND (%s)", [minimum_price, maximum_price])
-          productlist = cur.fetchall()  
-          cursor.close()
-          
-        return render_template("index.html")
     
 if __name__ == "__main__":
   import click
