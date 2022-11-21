@@ -1,5 +1,33 @@
 {% extends "application.html"%} {% block content %}
-<div class="cart-box">
-  <h1>PAST ORDERS</h1>
+<div class="login-box">
+  <div class="form">
+    <h1>PAST ORDERS</h1>
+
+    <div class="list-product-btn-container">
+      {% with success = get_flashed_messages(category_filter=["success"]) %} {%
+      if success %}
+      <div class="alert alert-success notification">
+        <span class="message">{{success[0]}}</span>
+      </div>
+      {% endif %} {% endwith %}
+    </div>
+
+    <div class="payment-container">
+      <div class="payment-methods-box">
+        {% for order in orders %}
+        <div class="payment-methods-card">
+          <div class="card-number">Order #{{order[0]}}</div>
+          <div class="card-other">Item count: {{order[1]}}</div>
+          <div class="card-other">Total: ${{order[2]}}</div>
+          <div class="card-other">Date: {{order[3]}}</div>
+          <div class="card-other"><strong>Products</strong></div>
+          {% for product in order[4]%}
+          <div class="card-other">{{product[2]}}</div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

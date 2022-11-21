@@ -467,6 +467,16 @@ a:hover {
   color: #002754;
 }
 
+.add-product-error-box {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.add-product-error {
+  width: 400px;
+}
+
 /*Cart*/
 .cart-box {
   padding: 10px 20px 10px 20px;

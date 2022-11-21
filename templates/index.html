@@ -11,6 +11,21 @@
   </div>
 </div>
 
+<div class="add-product-error-box">
+  {% with error = get_flashed_messages(category_filter=["error"]) %} {% if error
+  %}
+  <div class="alert alert-danger add-product-error">
+    <img
+      src="/static/warning.png"
+      height="45"
+      class="d-inline-block align-top warning-symbol"
+      alt=""
+    />
+    <span class="message">{{error[0]}}</span>
+  </div>
+  {% endif %} {% endwith %}
+</div>
+
 <div class="row card-group">
   {% for product in products %}
   <div class="col-3">
@@ -23,7 +38,29 @@
       <div class="card-body">
         <div class="card-title">{{product[0].upper()}}</div>
         <div class="card-text">${{product[1]}}</div>
-        <a href="#" class="btn card-submit">Add to cart</a>
+        <div class="card-text">{{product[4]}}</div>
+        <form method="POST" action="/add_cart">
+          <input
+            type="hidden"
+            value="{{product[5]}}"
+            id="productid"
+            name="productid"
+          />
+          {% if product[6]%}
+          <button
+            type="submit"
+            class="btn card-submit"
+            title="productid"
+            disabled
+          >
+            Sold
+          </button>
+          {% else %}
+          <button type="submit" class="btn card-submit" title="productid">
+            Add to cart
+          </button>
+          {% endif %}
+        </form>
       </div>
     </div>
   </div>
