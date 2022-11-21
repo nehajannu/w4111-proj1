@@ -53,14 +53,15 @@ def index():
     #Handle search request
     if request.method == "POST":
       keyword = request.form['keyword']
-      if keyword != "":
-        return search(keyword)
+      category_filter = request.form['category-filter']
+      price_sort = request.form['price-sort']
+      return search(keyword, category_filter, price_sort)
 
     #Default: Show all items
     products = []
     cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser")
     for result in cursor:
-      products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname'],result['username'],result['productid'],result['sold']))
+      products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname'],result['username'],result['productid'],result['sold'],result['cuid']))
     cursor.close()
     return render_template("index.html", products = products)
   
@@ -69,15 +70,43 @@ def index():
 
 #Sending search request to database
 @app.route('/search')
-def search(keyword):
+def search(keyword, category_filter, price_sort):
   if session.get('logged_in') == True:
     products = []
-    cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser WHERE productname = %s", keyword)
+    #ASC
+    if price_sort == 'ASC':
+      #keyword and category are both unfilled
+      if keyword == "" and category_filter == "all":
+        cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser ORDER BY \"productprice\" ASC")
+      #keyword is filled but not category
+      elif category_filter == "all":
+        cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser WHERE productname = %s ORDER BY \"productprice\" ASC", keyword)
+      #category is filled but not keyword
+      elif keyword == "":
+        cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser WHERE categoryname = %s ORDER BY \"productprice\" ASC", category_filter)
+      #keyword and category are both filled
+      else:
+        cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser WHERE productname = %s and categoryname = %s ORDER BY \"productprice\" ASC", keyword, category_filter)
+    #DESC
+    else:
+      #keyword and category are both unfilled
+      if keyword == "" and category_filter == "all":
+        cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser ORDER BY \"productprice\" DESC")
+      #keyword is filled but not category
+      elif category_filter == "all":
+        cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser WHERE productname = %s ORDER BY \"productprice\" DESC", keyword)
+      #category is filled but not keyword
+      elif keyword == "":
+        cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser WHERE categoryname = %s ORDER BY \"productprice\" DESC", category_filter)
+      #keyword and category are both filled
+      else:
+        cursor = g.conn.execute("SELECT * FROM product NATURAL JOIN belongs_to NATURAL JOIN category NATURAL JOIN listed_on NATURAL JOIN manages NATURAL JOIN cuuser WHERE productname = %s and categoryname = %s ORDER BY \"productprice\" DESC", keyword, category_filter)
+
     for result in cursor:
-      products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname'], result['username'],result['productid'],result['sold']))
+      products.append((result['productname'],result['productprice'],result['productimage'],result['categoryname'], result['username'],result['productid'],result['sold'],result['cuid']))
     cursor.close()
     return render_template("index.html", products = products)
-  
+
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
@@ -102,6 +131,7 @@ def login():
           #Store user info in session, which will be kept until log out
           session['logged_in'] = True
           session['current_user'] = cuid
+          session['password'] = password
           user_info = user_record[0]
           session['username'] = user_info['username']
           session['userdescription'] = user_info['userdescription']
@@ -152,7 +182,29 @@ def profile():
 @app.route('/settings', methods=['GET','POST'])
 def settings():
   if session.get('logged_in') == True:
-    return render_template("signup.html")
+    if request.method == 'POST':
+      #Update user information
+      username = request.form['username']
+      password = request.form['password']
+      userdescription = request.form['userdescription']
+      profilepic = request.form['profilepic']
+      cursor = g.conn.execute("UPDATE cuuser SET username =%s, password=%s, userdescription=%s, profilepic=%s WHERE cuid = %s", username, password, userdescription, profilepic, session['current_user'])
+      cursor.close()
+      session['username'] = username
+      session['password'] = password
+      session['userdescription'] = userdescription
+      session['profilepic'] = profilepic
+
+      #Show all items that the user has listed
+      cursor = g.conn.execute("SELECT productid, productname, productprice, productimage FROM cuuser NATURAL JOIN manages NATURAL JOIN listed_on NATURAL JOIN product WHERE cuid = %s", session['current_user'])
+      storefront_record = cursor.fetchall()
+      cursor.close()
+      storefront_products = []
+      for result in storefront_record:
+        storefront_products.append((result['productname'],result['productprice'],result['productimage'],result['productid']))
+      return render_template("profile.html", storefront_products = storefront_products)
+    return render_template("settings.html")
+
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
@@ -425,6 +477,36 @@ def delete_product():
       
       return redirect(url_for('profile'))
 
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
+
+#Seller storefront
+@app.route('/storefront', methods=['GET','POST'])
+def storefront():
+  if session.get('logged_in') == True:
+    #If there's no input, redirect to homepage
+    seller_input = request.form.get('seller', None)
+    if seller_input == None:
+      return redirect(url_for('index'))
+
+    #Grab seller information
+    cursor = g.conn.execute("SELECT * FROM cuuser NATURAL JOIN manages WHERE cuid = %s", seller_input)
+    seller_record = cursor.fetchall()
+    cursor.close()
+
+    seller_info = seller_record[0]
+    seller = (seller_input, seller_info['username'],seller_info['userdescription'],seller_info['profilepic'])
+
+    #Grab store information
+    cursor = g.conn.execute("SELECT productid, productname, productprice, productimage FROM cuuser NATURAL JOIN manages NATURAL JOIN listed_on NATURAL JOIN product WHERE cuid = %s", seller_input)
+    storefront_record = cursor.fetchall()
+    cursor.close()
+    #Show all items that the user has listed
+    storefront_products = []
+    for result in storefront_record:
+      storefront_products.append((result['productname'],result['productprice'],result['productimage'],result['productid']))
+    return render_template("storefront.html", storefront_products = storefront_products, seller=seller)
+  
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
     

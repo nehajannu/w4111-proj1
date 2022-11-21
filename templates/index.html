@@ -4,6 +4,37 @@
     <form method="POST" action="">
       <label for="keyword" class="search-label">Search</label>
       <input class="search-input" type="text" id="keyword" name="keyword" />
+      <label for="category-filter" class="search-label"
+        >Filter by category:</label
+      >
+      <select
+        name="category-filter"
+        id="category-filter"
+        title="category-filter"
+        class="filter-box"
+      >
+        <option value="all">All</option>
+        <option value="tops">Tops</option>
+        <option value="furniture">Furniture</option>
+        <option value="books">Books</option>
+        <option value="bottoms">Bottoms</option>
+        <option value="dresses">Dresses</option>
+        <option value="cooking utensils">Cooking Utensils</option>
+        <option value="electronics">Electronics</option>
+        <option value="home Decor">Home Decor</option>
+        <option value="shoes">Shoes</option>
+        <option value="storage">Storage</option>
+        <option value="others">Others</option>
+      </select>
+      <select
+        name="price-sort"
+        id="price-sort"
+        title="price-sort"
+        class="filter-box"
+      >
+        <option value="ASC">Low to High ($)</option>
+        <option value="DESC">High to Low ($)</option>
+      </select>
       <button type="submit" class="search-button" title="search-btn">
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
@@ -38,7 +69,17 @@
       <div class="card-body">
         <div class="card-title">{{product[0].upper()}}</div>
         <div class="card-text">${{product[1]}}</div>
-        <div class="card-text">{{product[4]}}</div>
+        <form method="post" action="/storefront">
+          <input
+            type="hidden"
+            value="{{product[7]}}"
+            id="seller"
+            name="seller"
+          />
+          <button type="submit" class="seller-btn" title="productid">
+            {{product[4]}}
+          </button>
+        </form>
         <form method="POST" action="/add_cart">
           <input
             type="hidden"
