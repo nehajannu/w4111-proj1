@@ -1,5 +1,44 @@
 {% extends "application.html"%} {% block content %}
 <div class="payment-box">
-  <h1>PAYMENT METHODS</h1>
+  <div class="form">
+    <h1>PAYMENT METHODS</h1>
+    <div class="list-product-btn-container">
+      {% with success = get_flashed_messages(category_filter=["success"]) %} {%
+      if success %}
+      <div class="alert alert-success notification">
+        <span class="message">{{success[0]}}</span>
+      </div>
+      {% endif %} {% endwith %}
+    </div>
+
+    <div class="payment-container">
+      <a href="/add_payment" class="btn list-button"
+        >Add payment method <i class="fa-solid fa-plus"></i
+      ></a>
+    </div>
+
+    <div class="payment-container">
+      <div class="payment-methods-box">
+        {% for payment in payment_methods %}
+        <div class="payment-methods-card">
+          <div class="card-number">{{payment[0]}}</div>
+          <div class="card-other">{{payment[1]}}</div>
+          <div class="card-other">{{payment[2]}}</div>
+          <form method="POST" action="/delete_payment">
+            <input
+              type="hidden"
+              value="{{payment[0]}}"
+              id="delete-payment"
+              name="delete-payment"
+            />
+            <button type="submit" class="delete-button" title="delete-button">
+              Delete <i class="fa-solid fa-trash"></i>
+            </button>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
