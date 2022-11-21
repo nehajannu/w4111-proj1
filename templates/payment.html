@@ -8,6 +8,11 @@
       <div class="alert alert-success notification">
         <span class="message">{{success[0]}}</span>
       </div>
+      {% endif %} {% endwith %} {% with error =
+      get_flashed_messages(category_filter=["error"]) %} {% if error %}
+      <div class="alert alert-danger notification">
+        <span class="message">{{error[0]}}</span>
+      </div>
       {% endif %} {% endwith %}
     </div>
 

@@ -411,6 +411,11 @@ a:hover {
   background: rgb(199, 58, 58);
 }
 
+.delete-button:disabled {
+  color: white;
+  background: #7b7b7b;
+}
+
 .list-product-btn-container {
   width: 100%;
   display: flex;
