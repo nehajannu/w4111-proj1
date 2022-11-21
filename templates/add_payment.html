@@ -1,7 +1,19 @@
 {% extends "application.html"%} {% block content %}
 <div class="login-box">
-  <form action="/login" method="post" class="form">
+  <form action="/add_payment" method="post" class="form">
     <h1>Please enter your payment information</h1>
+    {% if error %}
+    <div class="alert alert-danger notification">
+      <img
+        src="/static/warning.png"
+        height="45"
+        class="d-inline-block align-top warning-symbol"
+        alt=""
+      />
+      <span class="message">{{error}}</span>
+    </div>
+    {% endif %}
+
     <label for="creditcardholder">Cardholder</label>
     <input
       type="text"
@@ -19,7 +31,7 @@
       required
       class="form-input"
     /><br />
-    <label for="creditcardexpdate">Card Number</label>
+    <label for="creditcardexpdate">Card Expiration Date</label>
     <input
       type="date"
       name="creditcardexpdate"

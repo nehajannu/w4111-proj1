@@ -5,6 +5,7 @@ from sqlalchemy.pool import NullPool
 from flask import Flask, request, flash, render_template, g, redirect, Response, url_for, session
 import string
 import random
+import datetime
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
@@ -160,7 +161,6 @@ def payment():
     cursor = g.conn.execute("SELECT * FROM payment NATURAL JOIN has WHERE cuid = %s", session['current_user'])
     payment_record = cursor.fetchall()
     cursor.close()
-    print(payment_record)
 
     #Show all payment methods that the user has added
     payment_methods = []
@@ -175,7 +175,53 @@ def payment():
 @app.route('/add_payment', methods=['GET','POST'])
 def add_payment():
   if session.get('logged_in') == True:
-    return render_template("add_payment.html")
+    if request.method == 'POST':
+      creditcardno = request.form['creditcardno']
+      creditcardholder = request.form['creditcardholder']
+      creditcardexpdate = request.form['creditcardexpdate']
+
+      #Make sure the same card number doesn't already exist for the user
+      cursor = g.conn.execute("SELECT * FROM payment NATURAL JOIN has WHERE cuid = %s", session['current_user'])
+      payment_record = cursor.fetchall()
+      cursor.close()
+
+      for result in payment_record:
+        if result['creditcardno'] == creditcardno:
+          return render_template('add_payment.html', error= "Cannot add the same card number twice")
+    
+      #Add credit card to database
+      cursor = g.conn.execute("INSERT INTO payment VALUES(%s,%s,%s)",creditcardno, creditcardholder, creditcardexpdate)
+      cursor.close()
+      #Add credit card to user (has relationship)
+      cursor = g.conn.execute("INSERT INTO has VALUES(%s,%s)",creditcardno,session['current_user'])
+      cursor.close()
+
+      flash('Payment method successfully added!','success')
+      
+      return redirect(url_for('payment'))
+    return render_template('add_payment.html')
+
+  #Redirect to login page if user is not logged in
+  return redirect(url_for('login'))
+
+#Delete payment method
+@app.route('/delete_payment', methods = ['GET', 'POST'])
+def delete_payment():
+  if session.get('logged_in') == True:
+    if request.method == 'POST':
+      creditcardno = request.form['delete-payment']
+
+      #Remove payment from user (has relationship)
+      cursor = g.conn.execute("DELETE FROM has WHERE creditcardno = %s",creditcardno)
+      cursor.close()
+      #Remove payment from database
+      cursor = g.conn.execute("DELETE FROM payment WHERE creditcardno = %s",creditcardno)
+      cursor.close()
+
+      flash('Payment successfully removed!','success')
+      
+      return redirect(url_for('payment'))
+
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
@@ -225,7 +271,7 @@ def add_product():
   #Redirect to login page if user is not logged in
   return redirect(url_for('login'))
 
-#Server code for adding products to the storefront
+#Server code for deleting products to the storefront
 @app.route('/delete_product', methods = ['GET', 'POST'])
 def delete_product():
   if session.get('logged_in') == True:
