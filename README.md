@@ -22,11 +22,30 @@ We want to create a database that emulates the Facebook marketplace page for Col
 </p>
 
 ## Functionalities
+### Search page
 <img width="1200" alt="image" src="https://user-images.githubusercontent.com/66938562/205403250-e53ef560-9b1f-4241-9ef4-e32ce4d3ed44.png">
+
+### Profile page
 <img width="1200" alt="image" src="https://user-images.githubusercontent.com/66938562/205403567-efa265f3-b26b-44fe-8325-a1cd9820eff3.png">
 
 ## Database Design
+### ER Diagram
 <img width="1400" alt="Screen Shot 2022-12-02 at 6 17 23 PM" src="https://user-images.githubusercontent.com/66938562/205409795-16a93550-5534-4df6-a582-996a4f214efc.png">
+
+### SQL Schema
+    CREATE TABLE Storefront 
+      (  storeid VARCHAR(32),
+         storeitemcount INTEGER,
+         PRIMARY KEY (storeid))
+      
+     CREATE TABLE Product 
+       (  productid VARCHAR(32), 
+          productname VARCHAR(50) CHECK (LENGTH(productname) >= 1),
+          productprice FLOAT CONSTRAINT positive_price CHECK (productprice > 0),
+          productdescription VARCHAR(200),
+          productimage VARCHAR(500),
+          PRIMARY KEY (productid))
+
 
 ## Team members
 Josephine (Chiao Fen) Chan
