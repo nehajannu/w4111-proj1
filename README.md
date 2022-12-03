@@ -1,4 +1,4 @@
-# 4111 Introduction to Databases: Columbia Buy & Sell
+# COMS4111 Introduction to Databases: Project
 <p align="center"><img width="600" alt="image" align="center" src="https://user-images.githubusercontent.com/66938562/205405325-1754f788-a694-465e-88e5-49e5ecb899c2.png"></p>
 
 ### <p align="center">This project was chosen by Professor Gravano as a winner of the COMS4111 project competition</p>
@@ -6,10 +6,18 @@
 ## About
 We want to create a database that emulates the Facebook marketplace page for Columbia Buy & Sell. The domain is to provide an interface that allows students to easily list, search, and purchase items on campus. After signing up with a valid CUID, student can buy and sell items on the website. One portion of the application would allow the user to add a product to a storefront for the other users of the application to see. The other portion would resemble an online shopping website's interface where each product has a category attached to it, making it easier for users to find what they are looking for. 
 
+### Dependencies
+- Python 3.8.10
+- psql (PostgreSQL) 14.6 (Ubuntu 14.6-1.pgdg20.04+1)
+- Flask 2.2.2
+- sqlalchemy 1.4.44
+- psycopg2 2.9.5
+- click 8.1.3
+
 ### Run the application
 <code>python3 server.py</code>
 
-### Languages and Frameworks
+### Tools
 <p align="center">
  <!--Python-->
 <code><img height="30" width:"30" src="https://img.shields.io/badge/python-%233776AB.svg?&style=flat-square&logo=python&logoColor=white" /></code>
@@ -22,11 +30,30 @@ We want to create a database that emulates the Facebook marketplace page for Col
 </p>
 
 ## Functionalities
-### Search page
-<img width="1200" alt="image" src="https://user-images.githubusercontent.com/66938562/205403250-e53ef560-9b1f-4241-9ef4-e32ce4d3ed44.png">
+### Login
+Users can log in with their CUIDs and password. Currently we have not implemented the sign up functionality, so the website can only be logged into using the UNI of the repo owners and COMS4111 TAs.
 
-### Profile page
-<img width="1200" alt="image" src="https://user-images.githubusercontent.com/66938562/205403567-efa265f3-b26b-44fe-8325-a1cd9820eff3.png">
+![4111login](https://user-images.githubusercontent.com/66938562/205415620-8f60a628-9664-4a9d-8c3c-8800181ce97e.gif)
+
+### Search and Filter (Homepage)
+On the search page, students can search, filter, and sort items based on their preferences. We included the price sort filter because we believe students are more price-conscious. Besides browsing the products, students can also enter into other students' storefront to check out what other products are on sold.
+
+![4111search](https://user-images.githubusercontent.com/66938562/205414347-b88e1243-8392-46a3-9200-ee5458917f1e.gif)
+
+### Purchase
+Students can purchase products by adding products into the cart, checkout, select payment method, then submit the order. The order then will appear in the recent order tab. After the product is sold, the "Add to Cart" button will be disabled and instead "Sold" is displayed.
+
+![4111buy](https://user-images.githubusercontent.com/66938562/205415047-fdd74f24-10bf-4dfc-9d56-0fe924ecf38b.gif)
+
+### Profile & Storefront
+Students can go to their profile and edit their personal information as well as profile picture. They can also add and delete products that they would like to list on their storefront. The items on sale will show on the home page and available for other students to search. Students can also see how much profit they've made from sales made on Columbia Buy & Sell.
+
+![4111profile](https://user-images.githubusercontent.com/66938562/205414923-9ff62689-f8fa-4671-a397-c4c5a7b8ecb2.gif)
+
+### Payment
+Students can add and delete payment methods to their accounts. However, there should be at least one payment method per student according to our database design. Hence students are not allowed to delete their only payment method.
+
+![4111payment](https://user-images.githubusercontent.com/66938562/205415407-595539a7-a26f-4aad-ae28-63d979f2806e.gif)
 
 ## Database Design
 <img width="1400" alt="Screen Shot 2022-12-02 at 6 17 23 PM" src="https://user-images.githubusercontent.com/66938562/205409795-16a93550-5534-4df6-a582-996a4f214efc.png">
@@ -131,5 +158,5 @@ We want to create a database that emulates the Facebook marketplace page for Col
            REFERENCES CUUser)
 
 ## Team members
-Josephine (Chiao Fen) Chan
-Neha Jannu
+- Josephine (Chiao Fen) Chan
+- Neha Jannu
