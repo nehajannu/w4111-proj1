@@ -1,7 +1,7 @@
 # COMS4111 Introduction to Databases: Project
 <p align="center"><img width="600" alt="image" align="center" src="https://user-images.githubusercontent.com/66938562/205405325-1754f788-a694-465e-88e5-49e5ecb899c2.png"></p>
 
-### <p align="center">This project was chosen by Professor Gravano as a winner of the COMS4111 project competition</p>
+### <p align="center">🎉 This project was chosen as winner of the COMS4111 project competition among 100+ teams 🎉</p>
 
 ## About
 We want to create a database that emulates the Facebook marketplace page for Columbia Buy & Sell. The domain is to provide an interface that allows students to easily list, search, and purchase items on campus. After signing up with a valid CUID, student can buy and sell items on the website. One portion of the application would allow the user to add a product to a storefront for the other users of the application to see. The other portion would resemble an online shopping website's interface where each product has a category attached to it, making it easier for users to find what they are looking for. 
