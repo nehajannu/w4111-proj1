@@ -29,7 +29,7 @@ We want to create a database that emulates the Facebook marketplace page for Col
 <code><img height="30" width:"30" src="https://img.shields.io/badge/GoogleCloud-%234285F4.svg?style=for-the-badge&logo=google-cloud&logoColor=white" /></code>
 </p>
 
-## Functionalities
+## Features
 ### Login
 Users can log in with their CUIDs and password. Currently we have not implemented the sign up functionality, so the website can only be logged into using the UNI of the repo owners and COMS4111 TAs.
 
